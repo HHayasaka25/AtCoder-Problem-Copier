@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         AtCoder 問題文 Markdown 変換
+// @name         AtCoderProblemCopier
 // @namespace    https://github.com/HHayasaka25/AtCoder-Problem-Copier
 // @version      1.0.0
 // @match        https://atcoder.jp/contests/*/tasks/*
