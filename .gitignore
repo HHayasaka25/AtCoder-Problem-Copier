@@ -1,8 +1,4 @@
 # まず全部無視
-*
-
-# Git管理に必要なものだけ許可
-!.gitignore
-!README.md
-!manifest.json
-!content.js
+sample.html
+paste.md
+debug.js
