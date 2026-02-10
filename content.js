@@ -77,39 +77,50 @@ function showCopiedToast(targetBtn, message = "Copied!") {
 		color: "#fff",
 		borderRadius: "6px",
 		fontSize: "11px",
+		lineHeight: "1.2",
 		whiteSpace: "nowrap",
-		lineHeight: 1.2,
 		zIndex: 10000,
 
-		// アニメーション初期状態
 		opacity: "0",
-		transform: "translateY(4px)",
+		transform: "translate(-50%)",
 		transition: "opacity 0.2s ease, transform 0.2s ease",
-
 		pointerEvents: "none",
 	});
 
-	// ボタンの位置を基準に配置
+	// ▼ 下向き三角
+	const arrow = document.createElement("div");
+	Object.assign(arrow.style, {
+		position: "absolute",
+		left: "50%",
+		bottom: "-4px",
+		transform: "translateX(-50%)",
+		width: "0",
+		height: "0",
+		borderLeft: "4px solid transparent",
+		borderRight: "4px solid transparent",
+		borderTop: "4px solid #000",
+	});
+	toast.appendChild(arrow);
+
+	// ▼ 位置決定
 	const rect = targetBtn.getBoundingClientRect();
 	toast.style.left = `${rect.left + rect.width / 2}px`;
-	toast.style.top = `${rect.top - 14}px`;
-	toast.style.transform += " translateX(-50%)";
+	toast.style.top = `${rect.top - 24}px`;
 
 	document.body.appendChild(toast);
 
-	// フェードイン
+	// ▼ フェードイン
 	requestAnimationFrame(() => {
 		toast.style.opacity = "1";
-		toast.style.transform = "translate(-50%, -14px)";
+		// toast.style.transform = "translate(-50%, -10px)";
 	});
 
-	// 1秒後にフェードアウト
+	// ▼ フェードアウト
 	setTimeout(() => {
 		toast.style.opacity = "0";
-		toast.style.transform = "translate(-50%, -14px)";
 	}, 1000);
 
-	// 完全に消えたら削除
+	// ▼ 削除
 	setTimeout(() => {
 		toast.remove();
 	}, 1300);
@@ -153,6 +164,8 @@ function makeButtons(label, lang) {
 			console.log('[AtCoder Copy] クリップボードへのコピー成功');
 
 			showCopiedToast(btn);
+
+			btn.blur();
 
 			// 元のボタンと同じ挙動：ボタンの色は変えず、tooltipのみ表示
 			if (typeof $ !== 'undefined' && $.fn.tooltip) {

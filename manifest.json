@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "AtCoder Problem Copier",
 	"short_name": "AtCopy",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "問題文をMarkdown形式でコピーするボタンを追加するChrome拡張機能。",
 	"content_scripts": [
 		{
