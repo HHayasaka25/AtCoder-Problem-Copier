@@ -65,6 +65,55 @@ function watchLanguageSwitch() {
 	console.log('[AtCoder Copy] 言語切り替えボタンの監視を開始しました');
 }
 
+function showCopiedToast(targetBtn, message = "Copied!") {
+	const toast = document.createElement("div");
+	toast.textContent = message;
+
+	// 見た目
+	Object.assign(toast.style, {
+		position: "absolute",
+		padding: "6px 10px",
+		background: "#000",
+		color: "#fff",
+		borderRadius: "6px",
+		fontSize: "12px",
+		whiteSpace: "nowrap",
+		zIndex: 10000,
+
+		// アニメーション初期状態
+		opacity: "0",
+		transform: "translateY(4px)",
+		transition: "opacity 0.2s ease, transform 0.2s ease",
+
+		pointerEvents: "none",
+	});
+
+	// ボタンの位置を基準に配置
+	const rect = targetBtn.getBoundingClientRect();
+	toast.style.left = `${rect.left + rect.width / 2}px`;
+	toast.style.top = `${rect.top - 8}px`;
+	toast.style.transform += " translateX(-50%)";
+
+	document.body.appendChild(toast);
+
+	// フェードイン
+	requestAnimationFrame(() => {
+		toast.style.opacity = "1";
+		toast.style.transform = "translate(-50%, -8px)";
+	});
+
+	// 1秒後にフェードアウト
+	setTimeout(() => {
+		toast.style.opacity = "0";
+		toast.style.transform = "translate(-50%, -4px)";
+	}, 1000);
+
+	// 完全に消えたら削除
+	setTimeout(() => {
+		toast.remove();
+	}, 1300);
+}
+
 // ボタンを生成する
 function makeButtons(label, lang) {
 	const btn = document.createElement("span");
@@ -101,6 +150,8 @@ function makeButtons(label, lang) {
 		try {
 			await navigator.clipboard.writeText(text);
 			console.log('[AtCoder Copy] クリップボードへのコピー成功');
+
+			showCopiedToast(btn);
 
 			// 元のボタンと同じ挙動：ボタンの色は変えず、tooltipのみ表示
 			if (typeof $ !== 'undefined' && $.fn.tooltip) {
