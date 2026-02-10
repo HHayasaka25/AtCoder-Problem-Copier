@@ -2,8 +2,14 @@
 // @name         AtCoderProblemCopier
 // @namespace    https://github.com/HHayasaka25/AtCoder-Problem-Copier
 // @version      1.0.0
+// @description Add buttons to copy AtCoder problem statements in Markdown format
+// @author       LIama
+// @license      MIT
+// @homepage     https://github.com/HHayasaka25/AtCoder-Problem-Copier
+// @supportURL   https://github.com/HHayasaka25/AtCoder-Problem-Copier/issues
 // @match        https://atcoder.jp/contests/*/tasks/*
 // @grant        none
+// @run-at       document-end
 // ==/UserScript==
 
 (function () {
@@ -82,67 +88,6 @@
 		console.log('[AtCoder Copy] 言語切り替えボタンの監視を開始しました');
 	}
 
-	function showCopiedToast(targetBtn, message = "Copied!") {
-		const toast = document.createElement("div");
-		toast.textContent = message;
-
-		// 見た目
-		Object.assign(toast.style, {
-			position: "absolute",
-			padding: "4px 10px",
-			background: "#000",
-			color: "#fff",
-			borderRadius: "6px",
-			fontSize: "11px",
-			lineHeight: "1.2",
-			whiteSpace: "nowrap",
-			zIndex: 10000,
-
-			opacity: "0",
-			transform: "translate(-50%)",
-			transition: "opacity 0.2s ease, transform 0.2s ease",
-			pointerEvents: "none",
-		});
-
-		// ▼ 下向き三角
-		const arrow = document.createElement("div");
-		Object.assign(arrow.style, {
-			position: "absolute",
-			left: "50%",
-			bottom: "-4px",
-			transform: "translateX(-50%)",
-			width: "0",
-			height: "0",
-			borderLeft: "4px solid transparent",
-			borderRight: "4px solid transparent",
-			borderTop: "4px solid #000",
-		});
-		toast.appendChild(arrow);
-
-		// ▼ 位置決定
-		const rect = targetBtn.getBoundingClientRect();
-		toast.style.left = `${rect.left + rect.width / 2}px`;
-		toast.style.top = `${rect.top - 24}px`;
-
-		document.body.appendChild(toast);
-
-		// ▼ フェードイン
-		requestAnimationFrame(() => {
-			toast.style.opacity = "1";
-			// toast.style.transform = "translate(-50%, -10px)";
-		});
-
-		// ▼ フェードアウト
-		setTimeout(() => {
-			toast.style.opacity = "0";
-		}, 1000);
-
-		// ▼ 削除
-		setTimeout(() => {
-			toast.remove();
-		}, 1300);
-	}
-
 	// ボタンを生成する
 	function makeButtons(label, lang) {
 		const btn = document.createElement("span");
@@ -180,8 +125,6 @@
 				await navigator.clipboard.writeText(text);
 				console.log('[AtCoder Copy] クリップボードへのコピー成功');
 
-				showCopiedToast(btn);
-
 				btn.blur();
 
 				// 元のボタンと同じ挙動：ボタンの色は変えず、tooltipのみ表示
@@ -209,9 +152,7 @@
 		const target = document.querySelector("#main-container");
 		const lines = target.innerText.split("\n")
 		for (const line of lines) {
-			// console.log("行: ", line);
 			if (line.startsWith("実行時間制限")) {
-				// console.log("発見:", line);
 				return line;
 			}
 		}
@@ -230,9 +171,7 @@
 		// HTML から Markdown に変換
 		elements.forEach(element => {
 			const htmlText = element.innerHTML;
-			console.log(htmlText);
 			const markdown = convertToMarkdown(htmlText);
-			// console.log(markdown);
 			allParts.push(markdown);
 		})
 
@@ -247,9 +186,6 @@
 			japaneseParts = allParts.slice(0, splitIndex);
 			englishParts = allParts.slice(splitIndex);
 		}
-
-		console.log(japaneseParts);
-		console.log(englishParts);
 
 		return {
 			limit: limit,
@@ -300,7 +236,7 @@
 			if (tag === "PRE") {
 				const formulas = node.querySelectorAll(".katex-mathml");
 
-				// ① 数式が含まれている PRE
+				// 1. 数式が含まれている PRE
 				if (formulas.length > 0) {
 					const lines = [];
 					formulas.forEach(katex => {
@@ -314,7 +250,7 @@
 					return `\n\`\`\`\n${lines.join("\n")}\n\`\`\`\n\n`;
 				}
 
-				// ② 純テキスト PRE（入力例・出力例）
+				// 2. 純テキスト PRE（入力例・出力例）
 				const text = node.textContent
 					.replace(/\n+$/, "")   // 末尾の改行整理
 					.replace(/^\n+/, "");  // 先頭の改行整理
