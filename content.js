@@ -72,12 +72,13 @@ function showCopiedToast(targetBtn, message = "Copied!") {
 	// 見た目
 	Object.assign(toast.style, {
 		position: "absolute",
-		padding: "6px 10px",
+		padding: "4px 10px",
 		background: "#000",
 		color: "#fff",
 		borderRadius: "6px",
-		fontSize: "12px",
+		fontSize: "11px",
 		whiteSpace: "nowrap",
+		lineHeight: 1.2,
 		zIndex: 10000,
 
 		// アニメーション初期状態
@@ -91,7 +92,7 @@ function showCopiedToast(targetBtn, message = "Copied!") {
 	// ボタンの位置を基準に配置
 	const rect = targetBtn.getBoundingClientRect();
 	toast.style.left = `${rect.left + rect.width / 2}px`;
-	toast.style.top = `${rect.top - 8}px`;
+	toast.style.top = `${rect.top - 14}px`;
 	toast.style.transform += " translateX(-50%)";
 
 	document.body.appendChild(toast);
@@ -99,13 +100,13 @@ function showCopiedToast(targetBtn, message = "Copied!") {
 	// フェードイン
 	requestAnimationFrame(() => {
 		toast.style.opacity = "1";
-		toast.style.transform = "translate(-50%, -8px)";
+		toast.style.transform = "translate(-50%, -14px)";
 	});
 
 	// 1秒後にフェードアウト
 	setTimeout(() => {
 		toast.style.opacity = "0";
-		toast.style.transform = "translate(-50%, -4px)";
+		toast.style.transform = "translate(-50%, -14px)";
 	}, 1000);
 
 	// 完全に消えたら削除
