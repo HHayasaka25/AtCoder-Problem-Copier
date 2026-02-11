@@ -1,5 +1,8 @@
 # AtCoder Problem Statement → Markdown Converter
 
+# インストール
+Tampermonkeyなどのブラウザ拡張機能をインストールしたのち、[Greasy Fork](https://greasyfork.org/ja/scripts/565854-atcoderproblemcopier)からインストールすることができます。
+
 ## 概要（日本語）
 AtCoder の問題文ページを Markdown に変換してコピーするボタンを追加します。  
 AI への質問やメモ作成をしやすくする用途を想定しています。
