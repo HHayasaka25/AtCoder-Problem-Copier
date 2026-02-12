@@ -1,14 +1,8 @@
 // ==UserScript==
 // @name         AtCoderProblemCopier
-// @name:en      AtCoderProblemCopier
-// @name:zh-CN   AtCoderProblemCopier
-// @name:zh-TW   AtCoderProblemCopier
 // @namespace    https://github.com/HHayasaka25/AtCoder-Problem-Copier
 // @version      0.0.2
-// @description  AtCoderの問題文の横に、Markdown形式で問題文をコピーするボタンを追加します。
-// @description:en Add buttons to copy AtCoder problem statements in Markdown format
-// @description:zh-CN 在AtCoder题目页面添加Markdown格式的复制按钮
-// @description:zh-TW 在AtCoder題目頁面添加Markdown格式的複製按鈕
+// @description Add buttons to copy AtCoder problem statements in Markdown format
 // @author       LIama
 // @license      MIT
 // @homepage     https://github.com/HHayasaka25/AtCoder-Problem-Copier
@@ -17,6 +11,7 @@
 // @grant        none
 // @run-at       document-end
 // ==/UserScript==
+
 (function () {
 	'use strict';
 
@@ -48,8 +43,8 @@
 			group.className = "ext-copy-group";
 			group.style.marginLeft = "10px";
 
-			group.appendChild(makeButton("JP", "ja", data, data.ja.length > 0));
-			group.appendChild(makeButton("EN", "en", data, data.en.length > 0));
+			group.appendChild(makeButton("コピー", "ja", data, data.ja.length > 0));
+			group.appendChild(makeButton("Copy", "en", data, data.en.length > 0));
 
 			return group;
 		};
@@ -147,9 +142,8 @@
 	function getLimit() {
 		const target = document.querySelector("#main-container");
 		if (!target) return "";
-		const lines = target.innerText.split("\n")
-		// console.log(lines);
-		for (const line of lines) {
+		const lines = target.innerText.split("\n");
+        for (const line of lines) {
 			if (line.startsWith("実行時間制限")) {
 				return line.trim();
 			}
@@ -167,6 +161,8 @@
 		// 言語タグの確認
 		const langJaNode = container.querySelector("span.lang-ja");
 		const langEnNode = container.querySelector("span.lang-en");
+        console.log("日本語ノードを出力");
+        console.log(langJaNode);
 
 		// Case 1: 言語タグが存在する場合（通常）
 		if (langJaNode || langEnNode) {
@@ -180,7 +176,7 @@
 
 		// 言語タグが見つからなかった場合はすべて日本語として扱う
 		console.log('[APC] 言語タグが見つかりませんでした。全データをJPとして取得します。');
-		
+
 		return {
 			limit: limit,
 			ja: extractPartsFromNode(container), // 全てJPへ
@@ -195,7 +191,7 @@
 			const htmlText = element.innerHTML;
 			let markdown = convertToMarkdown(htmlText);
 			markdown = markdown.trim(); // 前後の空白・改行を除去
-			
+
 			// 空でない場合のみ追加（空行だけのブロック対策）
 			if (markdown !== "") {
 				parts.push(markdown);
@@ -218,10 +214,14 @@
 
 			if (node.nodeType !== Node.ELEMENT_NODE) return "";
 
+			// 除外対象のクラスや属性をチェック
 			if (
 				node.classList.contains("ext-copy-group") ||
 				node.classList.contains("div-btn-copy") ||
-				node.classList.contains("katex-html")
+				node.classList.contains("btn-copy") ||
+				node.classList.contains("btn") ||
+				node.classList.contains("katex-html") ||
+				node.getAttribute("data-toggle") === "tooltip"
 			) {
 				return "";
 			}
@@ -241,13 +241,36 @@
 						const anno = katex.querySelector('annotation[encoding="application/x-tex"]');
 						if (anno) lines.push(`$$${anno.textContent.trim()}$$`);
 					});
-					return `\n\`\`\`\n${lines.join("\n")}\n\`\`\`\n\n`;
+					return `\`\`\`\n${lines.join("\n")}\n\`\`\`\n\n`;
 				}
-				return `\n\`\`\`\n${node.textContent.replace(/^\n+|\n+$/g, "")}\n\`\`\`\n\n`;
+				return `\`\`\`\n${node.textContent.trim()}\n\`\`\`\n\n`;
+			}
+
+			// ブロックコンテナ判定（Setの代わりにSwitchを使用）
+			let isBlockContainer = false;
+			switch (tag) {
+				case "BODY":
+				case "SECTION":
+				case "DIV":
+				case "ARTICLE":
+				case "MAIN":
+				case "ASIDE":
+				case "HEADER":
+				case "FOOTER":
+				case "UL":
+				case "OL":
+				case "DL":
+				case "BLOCKQUOTE":
+					isBlockContainer = true;
+					break;
 			}
 
 			let children = "";
 			node.childNodes.forEach(child => {
+				// コンテナ直下の空白のみのテキストノードは、レイアウト用の改行/インデントとみなして無視する
+				if (isBlockContainer && child.nodeType === Node.TEXT_NODE && child.textContent.trim() === "") {
+					return;
+				}
 				children += walk(child);
 			});
 
