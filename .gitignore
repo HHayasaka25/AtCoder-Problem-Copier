@@ -1,3 +1,7 @@
-sample.html
-paste.md
-debug.js
+*
+
+!extension/
+!userscript/
+!.gitignore
+!LICENCE.txt
+!README.md
