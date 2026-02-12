@@ -320,6 +320,9 @@
 				case "H3": return `### ${children.trim()}\n\n`;
 				case "P": return `${children.trim()}\n\n`;
 				case "LI": return `- ${children.trim()}\n`;
+				case "UL":
+				case "OL":
+					return `${children}\n`;
 				case "BR": return "\n";
 				case "VAR":
 					const t = children.trim();
