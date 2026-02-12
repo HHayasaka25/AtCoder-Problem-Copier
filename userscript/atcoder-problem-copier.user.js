@@ -151,6 +151,7 @@
 	function getLimit() {
 		const target = document.querySelector("#main-container");
 		const lines = target.innerText.split("\n")
+		// console.log(lines);
 		for (const line of lines) {
 			if (line.startsWith("実行時間制限")) {
 				return line;
@@ -165,6 +166,21 @@
 		const container = document.querySelector("#task-statement")
 		if (!container) return { limit: limit, ja: [], en: [] };
 
+		// JPとEN問題文の存在チェック
+		const langJaNode = container.querySelector("span.lang-ja")
+		const langEnNode = container.querySelector("span.lang-en")
+
+		if (langJaNode && langEnNode) {
+			console.log("[APC] found both JP and EN tags.");
+			return {
+				limit: limit,
+				ja: extractPartsFromNode(langJaNode),
+				en: extractPartsFromNode(langEnNode),
+			}
+
+		}
+
+		// JP||ENが見つからない場合
 		const elements = container.querySelectorAll(".part");
 		const allParts = [];
 
