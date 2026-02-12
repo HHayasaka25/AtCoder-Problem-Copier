@@ -188,8 +188,6 @@
 		// 言語タグの確認
 		const langJaNode = container.querySelector("span.lang-ja");
 		const langEnNode = container.querySelector("span.lang-en");
-		console.log("日本語ノードを出力");
-		console.log(langJaNode);
 
 		// Case 1: 言語タグが存在する場合（通常）
 		if (langJaNode || langEnNode) {
@@ -227,7 +225,7 @@
 		return parts;
 	}
 
-	// この関数はchatGPTに助けを請うた（諦め）
+	// HTML -> Markdown
 	function convertToMarkdown(htmlText) {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(htmlText, "text/html");
