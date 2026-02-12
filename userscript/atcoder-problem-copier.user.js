@@ -27,15 +27,11 @@
 	function initButtons() {
 		console.log('[APC] ボタンの設置を開始');
 
+		// 既存のボタンを削除（重複防止）
+		document.querySelectorAll('.ext-copy-group').forEach(el => el.remove());
+
 		// データの取得
 		const data = cachedTaskData || getTask();
-
-		// ボタン挿入先の候補
-		const jaHeader = document.querySelector(".lang-ja h3");
-		const enHeader = document.querySelector(".lang-en h3");
-
-		// タグがない場合は最初の見出し3に追加
-		const firstHeader = document.querySelector("#task-statement h3");
 
 		// ボタンを作成する関数
 		const createButtonGroup = () => {
@@ -49,46 +45,77 @@
 			return group;
 		};
 
-		// ボタンを配置
-		// JPまたはENタグがある場合
-		if (jaHeader || enHeader) {
-			if (jaHeader) jaHeader.appendChild(createButtonGroup());
-			if (enHeader) enHeader.appendChild(createButtonGroup());
-		}
+		// 指定されたコンテナ内で、特定のテキストを含むh3を探すヘルパー関数
+		const findHeader = (root, candidates) => {
+			if (!root) return null;
+			const headers = Array.from(root.querySelectorAll("h3"));
+			for (const text of candidates) {
+				const found = headers.find(h => h.textContent.includes(text));
+				if (found) return found;
+			}
+			return null;
+		};
 
-		// 言語タグがない場合
-		else if (firstHeader) {
-			console.log("[APC] 言語タグが見つかりませんでした。最初の見出しにボタンを配置します。");
-			firstHeader.appendChild(createButtonGroup());
-		}
+		// 各エリアの取得
+		const jaNode = document.querySelector(".lang-ja");
+		const enNode = document.querySelector(".lang-en");
+		const taskStatement = document.querySelector("#task-statement");
 
-		console.log("[APC] ボタン配置完了。")
+		// --- ボタン配置ロジック ---
+
+		if (jaNode || enNode) {
+			// Case 1: 言語タグがある場合
+			if (jaNode) {
+				// 日本語エリア: "問題文" を優先検索、なければ最初のh3
+				const target = findHeader(jaNode, ["問題文"]) || jaNode.querySelector("h3");
+				if (target) target.appendChild(createButtonGroup());
+			}
+			if (enNode) {
+				// 英語エリア: "Problem Statement" を優先検索、なければ最初のh3
+				const target = findHeader(enNode, ["Problem Statement"]) || enNode.querySelector("h3");
+				if (target) target.appendChild(createButtonGroup());
+			}
+		} else if (taskStatement) {
+			// Case 2: 言語タグがない場合
+			// "問題文" > "Problem Statement" > 最初のh3 の順で優先して探す
+			let target = findHeader(taskStatement, ["問題文"]);
+			if (!target) target = findHeader(taskStatement, ["Problem Statement"]);
+			if (!target) target = taskStatement.querySelector("h3");
+
+			if (target) {
+				console.log("[APC] 言語タグなし。ターゲットヘッダー:", target.textContent.trim());
+				target.appendChild(createButtonGroup());
+			} else {
+				console.log("[APC] ボタン配置先のヘッダーが見つかりませんでした。");
+			}
+		}
+		console.log("[APC] ボタン配置完了。");
 	}
 
 	// 言語切り替えボタンのクリックを監視
 	function watchLanguageSwitch() {
-		console.log('[AtCoder Copy] watchLanguageSwitch() 開始');
+		console.log('[APC] watchLanguageSwitch() 開始');
 
 		const langBtn = document.querySelector('#task-lang-btn');
-		console.log('[AtCoder Copy] 言語切り替えボタン:', langBtn);
+		console.log('[APC] 言語切り替えボタン:', langBtn);
 
 		if (!langBtn) {
-			console.log('[AtCoder Copy] 言語切り替えボタンが見つかりません');
+			console.log('[APC] 言語切り替えボタンが見つかりません');
 			return;
 		}
 
 		// 言語切り替えボタンのクリックを監視
 		langBtn.addEventListener('click', function (e) {
-			console.log('[AtCoder Copy] 言語切り替えボタンがクリックされました', e.target);
+			console.log('[APC] 言語切り替えボタンがクリックされました', e.target);
 
 			// 少し遅延させてからボタンを追加（DOMの更新を待つ）
 			setTimeout(() => {
-				console.log('[AtCoder Copy] 50ms後、ボタンを再追加');
+				console.log('[APC] 50ms後、ボタンを再追加');
 				initButtons();
 			}, 50);
 		});
 
-		console.log('[AtCoder Copy] 言語切り替えボタンの監視を開始しました');
+		console.log('[APC] 言語切り替えボタンの監視を開始しました');
 	}
 
 	// ボタンを生成する
@@ -97,7 +124,7 @@
 		btn.className = "btn btn-default btn-sm btn-copy ml-1";
 		btn.innerText = label;
 
-		if(!isValid){
+		if (!isValid) {
 			// ボタンが無効 -> グレーアウト
 			btn.style.opacity = "0.4";
 			btn.style.cursor = "not-allowed";
@@ -143,7 +170,7 @@
 		const target = document.querySelector("#main-container");
 		if (!target) return "";
 		const lines = target.innerText.split("\n");
-        for (const line of lines) {
+		for (const line of lines) {
 			if (line.startsWith("実行時間制限")) {
 				return line.trim();
 			}
@@ -161,12 +188,12 @@
 		// 言語タグの確認
 		const langJaNode = container.querySelector("span.lang-ja");
 		const langEnNode = container.querySelector("span.lang-en");
-        console.log("日本語ノードを出力");
-        console.log(langJaNode);
+		console.log("日本語ノードを出力");
+		console.log(langJaNode);
 
 		// Case 1: 言語タグが存在する場合（通常）
 		if (langJaNode || langEnNode) {
-			console.log('[AtCoder Copy] 言語タグを検出しました。日英分離モードで取得します。');
+			console.log('[APC] 言語タグを検出しました。日英分離モードで取得します。');
 			return {
 				limit: limit,
 				ja: langJaNode ? extractPartsFromNode(langJaNode) : [],
@@ -216,23 +243,32 @@
 
 			// 除外対象のクラスや属性をチェック
 			if (
+				// Copyボタンは無視
 				node.classList.contains("ext-copy-group") ||
 				node.classList.contains("div-btn-copy") ||
 				node.classList.contains("btn-copy") ||
 				node.classList.contains("btn") ||
-				node.classList.contains("katex-html") ||
-				node.getAttribute("data-toggle") === "tooltip"
+				node.getAttribute("data-toggle") === "tooltip" ||
+				// 数式展開後の余計な要素は無視
+				node.classList.contains("katex-html")
 			) {
 				return "";
 			}
 
+			// 数式の処理
 			if (node.classList.contains("katex-mathml")) {
 				const anno = node.querySelector('annotation[encoding="application/x-tex"]');
-				return anno ? `$${anno.textContent.trim()}$` : "";
+				if (!anno) return "";
+				const latex = anno.textContent.trim();
+				// ディスプレイ数式（ブロック数式）の判定
+				// 親要素にkatex-displayがある、またはmathタグにdisplay="block"がある場合
+				const isDisplay = node.closest(".katex-display") || node.querySelector('math[display="block"]');
+				return isDisplay ? `\n$$\n${latex}\n$$\n` : `$${latex}$`;
 			}
 
 			const tag = node.tagName;
 
+			// コードブロック内の数式は特殊
 			if (tag === "PRE") {
 				const formulas = node.querySelectorAll(".katex-mathml");
 				if (formulas.length > 0) {
@@ -246,7 +282,7 @@
 				return `\`\`\`\n${node.textContent.trim()}\n\`\`\`\n\n`;
 			}
 
-			// ブロックコンテナ判定（Setの代わりにSwitchを使用）
+			// 空白のみの場合に無視するタグ
 			let isBlockContainer = false;
 			switch (tag) {
 				case "BODY":
