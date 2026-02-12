@@ -15,7 +15,10 @@
 (function () {
 	'use strict';
 
+	let cachedTaskData = null;
+
 	function main() {
+		cachedTaskData = getTask();
 		initButtons();
 		watchLanguageSwitch();
 	}
@@ -24,42 +27,42 @@
 	function initButtons() {
 		console.log('[AtCoder Copy] initButtons() 開始');
 
-		// 日本語と英語の両方の最初のh3にボタンを追加
+		// データの取得
+		const data = cachedTaskData || getTask();
+
+		// ボタン挿入先の候補
 		const jaHeader = document.querySelector(".lang-ja h3");
 		const enHeader = document.querySelector(".lang-en h3");
 
-		console.log('[AtCoder Copy] 日本語ヘッダー:', jaHeader);
-		console.log('[AtCoder Copy] 英語ヘッダー:', enHeader);
+		// タグがない場合は最初の見出し3に追加
+		const firstHeader = document.querySelector("#task-statement h3")
 
-		if (jaHeader && !jaHeader.querySelector(".ext-copy-group")) {
-			console.log('[AtCoder Copy] 日本語ヘッダーにボタンを追加');
+		// ボタンを作成する関数
+		const createButtonGroup = () => {
 			const group = document.createElement("span");
 			group.className = "ext-copy-group";
 			group.style.marginLeft = "10px";
 
-			group.appendChild(makeButtons("コピー", "ja"));
-			group.appendChild(makeButtons("Copy", "en"));
+			group.appencChild(makeButton("JP", "ja", data, data.ja.length > 0));
+			group.appendChild(makeButton("EN", "en", data, data.en.length > 0));
 
-			jaHeader.appendChild(group);
-		} else {
-			console.log('[AtCoder Copy] 日本語ヘッダーにはボタンが既に存在、またはヘッダーが見つからない');
+			return group;
+		};
+
+		// ボタンを配置
+		// JPまたはENタグがある場合
+		if (jaHeader || enHeader) {
+			if (jaHeader) jaHeader.appendChild(createButtonGroup());
+			if (enHeader) enHeader.appendChild(createButtonGroup());
 		}
 
-		if (enHeader && !enHeader.querySelector(".ext-copy-group")) {
-			console.log('[AtCoder Copy] 英語ヘッダーにボタンを追加');
-			const group = document.createElement("span");
-			group.className = "ext-copy-group";
-			group.style.marginLeft = "10px";
-
-			group.appendChild(makeButtons("コピー", "ja"));
-			group.appendChild(makeButtons("Copy", "en"));
-
-			enHeader.appendChild(group);
-		} else {
-			console.log('[AtCoder Copy] 英語ヘッダーにはボタンが既に存在、またはヘッダーが見つからない');
+		// 言語タグがない場合
+		else if (firstHeader) {
+			console.log("[APC] 言語タグが見つかりませんでした。最初の見出しにボタンを配置します。");
+			firstHeader.appendChild(createButtonGroup());
 		}
 
-		console.log('[AtCoder Copy] initButtons() 完了');
+		console.log("[APC] ボタン配置完了。")
 	}
 
 	// 言語切り替えボタンのクリックを監視
@@ -89,7 +92,7 @@
 	}
 
 	// ボタンを生成する
-	function makeButtons(label, lang) {
+	function makeButton(label, lang, data, isValid) {
 		const btn = document.createElement("span");
 
 		// クラスを完全に一致させる
