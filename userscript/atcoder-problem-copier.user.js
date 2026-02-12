@@ -1,8 +1,14 @@
 // ==UserScript==
 // @name         AtCoderProblemCopier
+// @name:en      AtCoderProblemCopier
+// @name:zh-CN   AtCoderProblemCopier
+// @name:zh-TW   AtCoderProblemCopier
 // @namespace    https://github.com/HHayasaka25/AtCoder-Problem-Copier
 // @version      0.0.2
-// @description Add buttons to copy AtCoder problem statements in Markdown format
+// @description  AtCoderの問題文の横に、Markdown形式で問題文をコピーするボタンを追加します。
+// @description:en Add buttons to copy AtCoder problem statements in Markdown format
+// @description:zh-CN 在AtCoder题目页面添加Markdown格式的复制按钮
+// @description:zh-TW 在AtCoder題目頁面添加Markdown格式的複製按鈕
 // @author       LIama
 // @license      MIT
 // @homepage     https://github.com/HHayasaka25/AtCoder-Problem-Copier
