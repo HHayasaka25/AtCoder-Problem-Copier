@@ -4,7 +4,7 @@
 // @name:zh-CN   AtCoderProblemCopier
 // @name:zh-TW   AtCoderProblemCopier
 // @namespace    https://github.com/HHayasaka25/AtCoder-Problem-Copier
-// @version      0.0.2
+// @version      0.0.5
 // @description  AtCoderの問題文の横に、Markdown形式で問題文をコピーするボタンを追加します。
 // @description:en Add buttons to copy AtCoder problem statements in Markdown format
 // @description:zh-CN 在AtCoder题目页面添加Markdown格式的复制按钮
@@ -150,7 +150,7 @@
 
 				// 対応するデータを選択
 				const contentParts = (lang === "ja") ? data.ja : data.en;
-				const text = [data.limit, ...contentParts].join("\n\n");
+				const text = [`Source: ${window.location.href}`, data.limit, ...contentParts].join("\n\n");
 
 				try {
 					await navigator.clipboard.writeText(text);
@@ -219,8 +219,7 @@
 		const elements = rootNode.querySelectorAll(".part");
 		const parts = [];
 		elements.forEach(element => {
-			const htmlText = element.innerHTML;
-			let markdown = convertToMarkdown(htmlText);
+			let markdown = convertToMarkdown(element);
 			markdown = markdown.trim(); // 前後の空白・改行を除去
 
 			// 空でない場合のみ追加（空行だけのブロック対策）
@@ -232,10 +231,7 @@
 	}
 
 	// HTML -> Markdown
-	function convertToMarkdown(htmlText) {
-		const parser = new DOMParser();
-		const doc = parser.parseFromString(htmlText, "text/html");
-
+	function convertToMarkdown(element) {
 		function walk(node) {
 			if (node.nodeType === Node.TEXT_NODE) {
 				let text = node.textContent;
@@ -252,7 +248,6 @@
 				node.classList.contains("div-btn-copy") ||
 				node.classList.contains("btn-copy") ||
 				node.classList.contains("btn") ||
-				node.getAttribute("data-toggle") === "tooltip" ||
 				// 数式展開後の余計な要素は無視
 				node.classList.contains("katex-html")
 			) {
@@ -332,7 +327,7 @@
 			}
 		}
 
-		return walk(doc.body).trim();
+		return walk(element).trim();
 	}
 
 	main();
