@@ -4,7 +4,7 @@
 // @name:zh-CN   AtCoderProblemCopier
 // @name:zh-TW   AtCoderProblemCopier
 // @namespace    https://github.com/HHayasaka25/AtCoder-Problem-Copier
-// @version      0.0.5
+// @version      0.0.4
 // @description  AtCoderの問題文の横に、Markdown形式で問題文をコピーするボタンを追加します。
 // @description:en Add buttons to copy AtCoder problem statements in Markdown format
 // @description:zh-CN 在AtCoder题目页面添加Markdown格式的复制按钮
@@ -249,7 +249,8 @@
 				node.classList.contains("btn-copy") ||
 				node.classList.contains("btn") ||
 				// 数式展開後の余計な要素は無視
-				node.classList.contains("katex-html")
+				node.classList.contains("katex-html") ||
+				node.classList.contains("prettyprint")
 			) {
 				return "";
 			}
@@ -276,9 +277,9 @@
 						const anno = katex.querySelector('annotation[encoding="application/x-tex"]');
 						if (anno) lines.push(`$$${anno.textContent.trim()}$$`);
 					});
-					return `\`\`\`\n${lines.join("\n")}\n\`\`\`\n\n`;
+					return `\n\`\`\`\n${lines.join("\n")}\n\`\`\`\n\n`;
 				}
-				return `\`\`\`\n${node.textContent.trim()}\n\`\`\`\n\n`;
+				return `\n\`\`\`\n${node.textContent.trim()}\n\`\`\`\n\n`;
 			}
 
 			// 空白のみの場合に無視するタグ
@@ -296,6 +297,7 @@
 				case "OL":
 				case "DL":
 				case "BLOCKQUOTE":
+				case "DETAIL":
 					isBlockContainer = true;
 					break;
 			}
